@@ -59,6 +59,17 @@ def delete_archives(client, vault_name, archive_list, account_id='-'):
             print(f"Error deleting archive {archive_id}: {e}")
     return
 
+def delete_vault(client, vault_name, account_id='-'):
+    """
+    Deletes the specified Glacier vault. The vault must be empty.
+    """
+    try:
+        print(f"Deleting vault '{vault_name}'...")
+        client.delete_vault(vaultName=vault_name, accountId=account_id)
+        print(f"Vault '{vault_name}' has been successfully deleted.")
+    except Exception as e:
+        print(f"Error deleting vault '{vault_name}': {e}")
+
 def main():
     parser = argparse.ArgumentParser(description="Empty an AWS Glacier vault by deleting all archives.")
     parser.add_argument("vault_name", help="The name of the AWS Glacier vault to empty")
@@ -87,7 +98,10 @@ def main():
         delete_archives(client, args.vault_name, archive_list, args.account_id)
         print("Deletion of all archives is complete.")
     
-    print("The vault is now empty. You can proceed to delete the vault itself via the AWS console or CLI.")
+    # Step 5: Delete the vault itself
+    delete_vault(client, args.vault_name, args.account_id)
+
+    print("The vault is now empty and has been deleted.")
 
 if __name__ == "__main__":
     main()
